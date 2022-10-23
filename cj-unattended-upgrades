@@ -1,11 +1,13 @@
 #!/bin/bash
 
 set -euo pipefail
-# IFS=
+IFS=
 
-perhaps_dry=
+dry_or_y=
 if [ "${CJ_UNATTENDED_UPGRADES_DRY_RUN-}" = 1 ]; then
-    perhaps_dry=--dry-run
+    dry_or_y=--dry-run
+else
+    dry_or_y=-y
 fi
 
 myname=$(basename "$0")
@@ -43,7 +45,7 @@ apt-get update \
 upgradetmp=$(mktemp)
 
 export DEBIAN_FRONTEND=noninteractive
-apt-get dist-upgrade $perhaps_dry -o Dpkg::Options::="--force-confold" \
+apt-get dist-upgrade "$dry_or_y" -o Dpkg::Options::="--force-confold" \
         > "$upgradetmp" 2>&1 || die "apt-get dist-upgrade failed"
 
 # Were there upgrades?  If so, say so.  Otherwise, say nothing.
