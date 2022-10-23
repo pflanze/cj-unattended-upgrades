@@ -3,9 +3,11 @@
 set -euo pipefail
 IFS=
 
-logdir=/var/log/cj-unattended-upgrades
-
+myname=$(basename "$0")
 mydir=$(dirname "$0")
+source "$mydir/shared.sh"
+
+logdir=/var/log/cj-unattended-upgrades
 
 help() {
     echo "$0 start|stop|restart|status"
