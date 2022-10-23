@@ -55,13 +55,19 @@ apt-get dist-upgrade "$dry_or_y" -o Dpkg::Options::="--force-confold" \
 
 # Were there upgrades?  If so, say so.  Otherwise, say nothing.
 
-numdone=$(tail -1 "$upgradetmp" | perl -wne '
-    $z = 0;
-    if (my ($n) = /\b(\d+) upgraded/) { $z += $n } 
-        else { warn "no match: upgraded" }
-    if (my ($n) = /\b(\d+) newly installed/) { $z += $n }
-        else { warn "no match: newly installed" }
-    print $z or die $!
+numdone=$(tail -2 "$upgradetmp" | perl -wne '
+    BEGIN { $z = 0; $saw_upgraded = 0; $saw_installed = 0; }
+    push @lines, $_;
+    if (my ($n) = /\b(\d+) upgraded/) { $z += $n; $saw_upgraded = 1 } 
+    if (my ($n) = /\b(\d+) newly installed/) { $z += $n; $saw_installed = 1 }
+    END {
+        unless (($saw_upgraded + $saw_installed) == 2) {
+            warn "no match: upgraded\n" unless $saw_upgraded;
+            warn "no match: newly installed\n" unless $saw_installed;
+            warn "in:\n@lines\n";
+        }
+        print $z or die $!
+    }
 ')
 
 if [ "$numdone" -gt 0 ]; then
