@@ -75,7 +75,10 @@ while true; do
     fi
     rm -f "$mailfile" "$out"
 
-    test "$errs" = 0
+    if [ "$errs" -ne 0 ]; then
+        echo "Exiting daemon due to serious error(s)."
+        exit 1
+    fi
     
     # Do not add --quiet flag right now, to allow for debugging
     sleep-random "${CJ_UNATTENDED_UPGRADES_SLEEPTIME-4h}"
