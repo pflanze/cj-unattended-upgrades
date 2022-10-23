@@ -7,11 +7,10 @@ My own complexities are the best!
 Wanted features:
 
 - use a schedule that suits a laptop user (don't ask, just run)
-- mail with success or failures (remain silent if there were no upgrades)
+- report on upgrade success or failure via email to root (remain silent if there were no upgrades)
 - have debconf questions go to mail as well
 - dpkg conf files: keep old version (and report the need for manual action?)
-- report failures via local email
-- do not report failure if (due to being?) offline
+- do not report failure if (or due to being?) offline
 - delay shutdown while upgrades are running
 - finish upgrade at boot time if it was interrupted anyway? (Foreground, but interruptible?)
 
