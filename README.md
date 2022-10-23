@@ -46,6 +46,12 @@ Future:
   `CJ_UNATTENDED_UPGRADES_SLEEPTIME` to a string that is understood by
   `sleep-random`.
 
+   E.g.
+
+        ln -s /opt/chj/cj-unattended-upgrades/init-cj-unattended-upgrades /etc/init.d/cj-unattended-upgrades
+        systemctl enable --now cj-unattended-upgrades
+
+
 ## Mail check
 
 Since cj-unattended-upgrades is meant for laptop/desktop installations

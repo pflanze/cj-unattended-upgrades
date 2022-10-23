@@ -1,5 +1,15 @@
 #!/bin/bash
 
+### BEGIN INIT INFO
+# Provides: cj-unattended-upgrades
+# Required-Start: $local_fs
+# Required-Stop: 
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: cj's unattended apt upgrades
+# Description: see https://github.com/pflanze/cj-unattended-upgrades
+### END INIT INFO
+
 set -euo pipefail
 IFS=
 
