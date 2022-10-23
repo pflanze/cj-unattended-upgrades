@@ -16,6 +16,8 @@ if [ $# -ne 1 ]; then
     help
 fi
 
+PATH="/opt/chj/bin:$PATH"
+
 daemonize --multilog "$logdir" --action "$1" \
           "$mydir"/cj-unattended-upgrades-daemon
 
