@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -euo pipefail
+IFS=
+
+logdir=/var/log/cj-unattended-upgrades
+
+mydir=$(dirname "$0")
+
+help() {
+    echo "$0 start|stop|restart|status"
+    exit 1
+}
+
+if [ $# -ne 1 ]; then
+    help
+fi
+
+daemonize --multilog "$logdir" --action "$1" \
+          "$mydir"/cj-unattended-upgrades-daemon
+
+# ^ No need to run the daemon script via `loop`?

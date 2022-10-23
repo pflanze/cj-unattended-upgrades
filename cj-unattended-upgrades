@@ -1,0 +1,68 @@
+#!/bin/bash
+
+set -euo pipefail
+# IFS=
+
+perhaps_dry=
+if [ "${CJ_UNATTENDED_UPGRADES_DRY_RUN-}" = 1 ]; then
+    perhaps_dry=--dry-run
+fi
+
+myname=$(basename "$0")
+
+updatetmp=
+upgradetmp=
+
+perhaps_showfile () {
+    local filekind
+    local perhaps_filepath
+    filekind="$1"
+    perhaps_filepath="$2"
+    if [ -n "$perhaps_filepath" ]; then
+        echo "/==== $filekind: ============================================\\"
+        cat "$perhaps_filepath"
+        echo "\\============================================================/"
+        echo
+    fi
+}
+
+die () {
+    echo "Subject: $myname failure: $*"
+    echo
+    perhaps_showfile "update output" "$updatetmp"
+    perhaps_showfile "upgrade output" "$upgradetmp"
+    exit 0 # OK?
+}
+
+updatetmp=$(mktemp)
+
+# apt-get -q=2 update > "$updtmp" 2>&1
+apt-get update \
+        > "$updatetmp" 2>&1 || die "apt-get update failed"
+
+upgradetmp=$(mktemp)
+
+export DEBIAN_FRONTEND=noninteractive
+apt-get dist-upgrade $perhaps_dry -o Dpkg::Options::="--force-confold" \
+        > "$upgradetmp" 2>&1 || die "apt-get dist-upgrade failed"
+
+# Were there upgrades?  If so, say so.  Otherwise, say nothing.
+
+numdone=$(tail -1 "$upgradetmp" | perl -wne '
+    $z = 0;
+    if (my ($n) = /\b(\d+) upgraded/) { $z += $n } 
+        else { warn "no match: upgraded" }
+    if (my ($n) = /\b(\d+) newly installed/) { $z += $n }
+        else { warn "no match: newly installed" }
+    print $z or die $!
+')
+
+if [ "$numdone" -gt 0 ]; then
+    echo "Subject: $myname: $numdone packages upgraded/installed"
+    echo
+    perhaps_showfile "update output" "$updatetmp"
+    perhaps_showfile "upgrade output" "$upgradetmp"
+fi
+
+rm -f "$updatetmp" "$upgradetmp"
+

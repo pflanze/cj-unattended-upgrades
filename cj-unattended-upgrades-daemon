@@ -1,0 +1,48 @@
+#!/bin/bash
+
+set -euo pipefail
+IFS=
+
+mydir=$(dirname "$0")
+
+print_headers() {
+    # excluding body separator (only constant headers)
+    echo "From: root"
+    echo "To: root"
+}
+
+errs=0
+while true; do
+    out=$(mktemp)
+    mailfile=$(mktemp)
+    if "$mydir"/cj-unattended-upgrades > "$out" 2>&1; then
+        if [ -s "$out" ]; then
+            {
+                print_headers
+                cat "$out"
+            } >> "$mailfile"
+        fi
+        # Otherwise stay silent.
+    else
+        errs=1
+        {
+            print_headers
+            echo 'Subject: cj-unattended-upgrades has failed!'
+            echo
+            echo "This is a serious failure and indicates a bug."
+            echo
+            echo "The error(s):"
+            echo
+            cat "$out"
+        } >> "$mailfile"
+    fi
+    if [ -s "$mailfile" ]; then
+        sendmail -t < "$mailfile"
+    fi
+    rm -f "$mailfile" "$out"
+
+    test "$errs" = 0
+    
+    # Do not add --quiet flag right now, to allow for debugging
+    sleep-random "${CJ_UNATTENDED_UPGRADES_SLEEPTIME-4h}"
+done
