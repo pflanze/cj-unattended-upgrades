@@ -16,7 +16,11 @@ IFS=
 mypath=$(readlink -f "$0")
 myname=$(basename "$mypath")
 mydir=$(dirname "$mypath")
+# Verify sanity of installation:
+# - get config
 source "$mydir/shared.sh"
+# - check for dependencies (chj-scripts, and Time::ParseDate)
+_version=$(pmversion -p Time::ParseDate)
 
 logdir=/var/log/cj-unattended-upgrades
 
