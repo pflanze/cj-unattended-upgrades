@@ -42,3 +42,13 @@ Future:
   `CJ_UNATTENDED_UPGRADES_SLEEPTIME` to a string that is understood by
   `sleep-random`.
 
+## Mail check
+
+Since cj-unattended-upgrades is meant for laptop/desktop installations
+of end users, some setup to deal with the mails sent by it may be
+needed. One possibility:
+
+- use xfce, and xfce4-mailwatch-plugin
+- install claws-mail
+- add xfce4-mailwatch-plugin's "Mail Watcher" panel item to the panel, and configure it via right-click -> properties, add local mbox /var/mail/<username> under Mailboxes, interval 1 minute, set "Run on click" to `claws-mail --receive`, and "Run on each change of new message count" to `bash -c 'if test -s /var/mail/chris; then notify-send "new mail"; fi'`
+
