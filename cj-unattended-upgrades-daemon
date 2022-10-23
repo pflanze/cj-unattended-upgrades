@@ -48,7 +48,7 @@ no_interrupt() {
 }
 
 echo "$myname started"
-trap 'echo "$myname stopped"' EXIT
+trap 'echo "$myname stopped"' 15
 
 errs=0
 while true; do
