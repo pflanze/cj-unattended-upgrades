@@ -13,8 +13,9 @@
 set -euo pipefail
 IFS=
 
-myname=$(basename "$0")
-mydir=$(dirname "$0")
+mypath=$(readlink -f "$0")
+myname=$(basename "$mypath")
+mydir=$(dirname "$mypath")
 source "$mydir/shared.sh"
 
 logdir=/var/log/cj-unattended-upgrades

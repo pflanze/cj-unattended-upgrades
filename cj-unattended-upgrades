@@ -3,6 +3,8 @@
 set -euo pipefail
 IFS=
 
+#mypath=$(readlink -f "$0")
+# No, only init-cj-unattended-upgrades is meant to be symlinked
 myname=$(basename "$0")
 mydir=$(dirname "$0")
 source "$mydir/shared.sh"
