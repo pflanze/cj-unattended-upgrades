@@ -55,26 +55,32 @@ apt-get dist-upgrade "$dry_or_y" -o Dpkg::Options::="--force-confold" \
 
 # Were there upgrades?  If so, say so.  Otherwise, say nothing.
 
-numdone=$(tail -2 "$upgradetmp" | perl -wne '
-    BEGIN { $z = 0; $saw_upgraded = 0; $saw_installed = 0; }
-    push @lines, $_;
-    if (my ($n) = /\b(\d+) upgraded/) { $z += $n; $saw_upgraded = 1 } 
-    if (my ($n) = /\b(\d+) newly installed/) { $z += $n; $saw_installed = 1 }
+if numdone=$(perl -wne '
+    BEGIN { $z = 0; $saw = 0; }
+    if (my ($n, $m) = /^(\d+) upgraded, (\d+) newly installed/) { $z += $n + $m; $saw++ } 
     END {
-        unless (($saw_upgraded + $saw_installed) == 2) {
-            warn "no match: upgraded\n" unless $saw_upgraded;
-            warn "no match: newly installed\n" unless $saw_installed;
-            warn "in:\n@lines\n";
+        if ($saw == 1) {
+            print $z or die $!
+        } elsif ($saw) {
+            die "more than one match in given file"
+        } else {
+            die "no match in given file"
         }
-        print $z or die $!
     }
-')
+' < "$upgradetmp"); then
 
-if [ "$numdone" -gt 0 ]; then
-    echo "Subject: $myname: $numdone packages upgraded/installed"
+    if [ "$numdone" -gt 0 ]; then
+        echo "Subject: $myname: $numdone packages upgraded/installed"
+        echo
+        perhaps_showfile "update output" "$updatetmp"
+        perhaps_showfile "upgrade output" "$upgradetmp"
+    fi
+
+else
     echo
-    perhaps_showfile "update output" "$updatetmp"
-    perhaps_showfile "upgrade output" "$upgradetmp"
+    echo "File contents:"
+    echo
+    cat "$upgradetmp"
 fi
 
 #rm -f "$updatetmp" "$upgradetmp"
