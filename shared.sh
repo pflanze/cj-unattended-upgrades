@@ -7,6 +7,9 @@ spoolfile=/var/spool/cj-unattended-upgrades.running
 # does not work (by default, on Debian).
 #notification_email=
 
+# Find chj-scripts
+PATH="/opt/chj/bin:$PATH"
+
 source /etc/cj-unattended-upgrades.sh
 
 if [ "${notification_email-}" = "" ]; then

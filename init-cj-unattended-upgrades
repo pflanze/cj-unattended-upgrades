@@ -17,7 +17,7 @@ mypath=$(readlink -f "$0")
 myname=$(basename "$mypath")
 mydir=$(dirname "$mypath")
 # Verify sanity of installation:
-# - get config
+# - get config, including setting PATH
 source "$mydir/shared.sh"
 # - check for dependencies (chj-scripts, and Time::ParseDate)
 _version=$(pmversion -p Time::ParseDate)
@@ -32,8 +32,6 @@ help() {
 if [ $# -ne 1 ]; then
     help
 fi
-
-PATH="/opt/chj/bin:$PATH"
 
 daemonize --multilog "$logdir" --action "$1" \
           "$mydir"/cj-unattended-upgrades-daemon
