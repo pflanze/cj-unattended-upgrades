@@ -11,11 +11,15 @@ print_headers() {
     echo "To: root"
 }
 
+no_interrupt() {
+    systemd-inhibit --no-pager --who=cj-unattended-upgrades --why="currently upgrading the system" -- "$@"
+}
+
 errs=0
 while true; do
     out=$(mktemp)
     mailfile=$(mktemp)
-    if "$mydir"/cj-unattended-upgrades > "$out" 2>&1; then
+    if no_interrupt "$mydir"/cj-unattended-upgrades > "$out" 2>&1; then
         if [ -s "$out" ]; then
             {
                 print_headers
