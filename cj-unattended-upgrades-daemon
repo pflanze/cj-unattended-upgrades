@@ -9,7 +9,7 @@ source "$mydir/shared.sh"
 print_headers() {
     # excluding body separator (only constant headers)
     echo "From: root"
-    echo "To: root"
+    echo "To: $notification_email"
 }
 
 if [ -e "$spoolfile" ]; then

@@ -28,7 +28,11 @@ Future:
   has come out (you probably want to configure `/etc/apt/sources.list`
   to refer to a named release).
 
-* Make sure mail for `root` is going to some useful place.
+* Create a file `/etc/cj-unattended-upgrades.sh` that sets the
+  `notification_email` shell variable to the email address that should
+  be receiving the information emails (Note that `root` does *not*
+  work with Debian's default installation of exim! Other local user
+  names do work.)
 
 * Install [chj-scripts](https://github.com/pflanze/chj-scripts.git)
   (maybe via [chjize](https://github.com/pflanze/chjize)), as well
