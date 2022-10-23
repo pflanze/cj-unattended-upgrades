@@ -39,18 +39,27 @@ Future:
   `daemontools` (used for the logging) and `libtime-parsedate-perl`
   (not installed by chjize, currently).
 
-* Start the daemon as root via `init-cj-unattended-upgrades` (e.g. via
-  sysv/systemd or root's crontab). Make sure the chj-scripts can be
-  found via its `PATH`. Optionally, set
-  `CJ_UNATTENDED_UPGRADES_DRY_RUN=1`, and/or set
-  `CJ_UNATTENDED_UPGRADES_SLEEPTIME` to a string that is understood by
-  `sleep-random`.
+* Run `init-cj-unattended-upgrades` without arguments to verify
+  that the config and dependencies are available.
+  The chj-scripts must be found via its `PATH`, or their default
+  location, `/opt/chj/bin`.
 
-   E.g.
+* Optionally, set `CJ_UNATTENDED_UPGRADES_DRY_RUN=1` for testing
+  without installing any upgrades, and/or set
+  `CJ_UNATTENDED_UPGRADES_SLEEPTIME` to a string that is understood by
+  `sleep-random` (default: 4h).
+
+* Start the daemon as root via `init-cj-unattended-upgrades start`.
+
+* Install as a sysv style service via:
 
         ln -s /opt/chj/cj-unattended-upgrades/init-cj-unattended-upgrades /etc/init.d/cj-unattended-upgrades
         systemctl enable --now cj-unattended-upgrades
 
+  Alternatively, could start the daemon from a `@reboot` entry in the
+  crontab of the root user, but since emailing and logging is handled
+  directly, this doesn't seem to make sense, except if you find this
+  nicer to set environment variables.
 
 ## Mail check
 
