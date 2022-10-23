@@ -3,14 +3,16 @@
 set -euo pipefail
 IFS=
 
+myname=$(basename "$0")
+mydir=$(dirname "$0")
+source "$mydir/shared.sh"
+
 dry_or_y=
 if [ "${CJ_UNATTENDED_UPGRADES_DRY_RUN-}" = 1 ]; then
     dry_or_y=--dry-run
 else
     dry_or_y=-y
 fi
-
-myname=$(basename "$0")
 
 updatetmp=
 upgradetmp=
@@ -33,8 +35,11 @@ die () {
     echo
     perhaps_showfile "update output" "$updatetmp"
     perhaps_showfile "upgrade output" "$upgradetmp"
+    rm -f "$spoolfile"
     exit 0 # OK?
 }
+
+date > "$spoolfile"
 
 updatetmp=$(mktemp)
 
@@ -67,4 +72,4 @@ if [ "$numdone" -gt 0 ]; then
 fi
 
 rm -f "$updatetmp" "$upgradetmp"
-
+rm -f "$spoolfile"

@@ -4,12 +4,42 @@ set -euo pipefail
 IFS=
 
 mydir=$(dirname "$0")
+source "$mydir/shared.sh"
 
 print_headers() {
     # excluding body separator (only constant headers)
     echo "From: root"
     echo "To: root"
 }
+
+if [ -e "$spoolfile" ]; then
+    # First try to finish / 'rescue' a previous installation run
+    spoolfilecontents=$(cat "$spoolfile")
+    out=$(mktemp)
+    mailfile=$(mktemp)
+    (
+        set -x
+        export DEBIAN_FRONTEND=noninteractive
+        apt-get -y --fix-broken -o Dpkg::Options::="--force-confold" install \
+            || true
+        dpkg --force-confold --configure --pending || true
+    ) > "$out" 2>&1
+    {
+        print_headers
+        echo "Subject: cj-unattended-upgrades: finished/fixed upgrade on boot"
+        echo
+        echo "The last installation run, from $spoolfilecontents,"
+        echo "was interrupted. cj-unattended-upgrades-daemon has"
+        echo "tried to finish / fix it up on boot, with the following"
+        echo "results:"
+        echo
+        cat "$out"
+    } >> "$mailfile"
+    sendmail -t < "$mailfile"
+    rm -f "$spoolfile"
+fi
+
+
 
 no_interrupt() {
     systemd-inhibit --no-pager --who=cj-unattended-upgrades --why="currently upgrading the system" -- "$@"
