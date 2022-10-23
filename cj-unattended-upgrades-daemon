@@ -3,7 +3,9 @@
 set -euo pipefail
 IFS=
 
-mydir=$(dirname "$0")
+mypath=$(readlink -f "$0")
+myname=$(basename "$mypath")
+mydir=$(dirname "$mypath")
 source "$mydir/shared.sh"
 
 print_headers() {
@@ -44,6 +46,9 @@ fi
 no_interrupt() {
     systemd-inhibit --no-pager --who=cj-unattended-upgrades --why="currently upgrading the system" -- "$@"
 }
+
+echo "$myname started"
+trap 'echo "$myname stopped"' EXIT
 
 errs=0
 while true; do
