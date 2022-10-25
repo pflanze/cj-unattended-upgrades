@@ -25,6 +25,8 @@ if [ -e "$spoolfile" ]; then
         apt-get -y --fix-broken -o Dpkg::Options::="--force-confold" install \
             || true
         dpkg --force-confold --configure --pending || true
+        apt-get -y --fix-broken -o Dpkg::Options::="--force-confold" install \
+            || true
     ) > "$out" 2>&1
     {
         print_headers
