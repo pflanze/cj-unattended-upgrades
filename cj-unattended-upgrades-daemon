@@ -28,7 +28,7 @@ if [ -e "$spoolfile" ]; then
     ) > "$out" 2>&1
     {
         print_headers
-        echo "Subject: cj-unattended-upgrades: finished/fixed upgrade on boot"
+        echo "Subject: cj-unattended-upgrades-run: finished/fixed upgrade on boot"
         echo
         echo "The last installation run, from $spoolfilecontents,"
         echo "was interrupted. cj-unattended-upgrades-daemon has"
@@ -44,7 +44,7 @@ fi
 
 
 no_interrupt() {
-    systemd-inhibit --no-pager --who=cj-unattended-upgrades --why="currently upgrading the system" -- "$@"
+    systemd-inhibit --no-pager --who=cj-unattended-upgrades-run --why="currently upgrading the system" -- "$@"
 }
 
 echo "$myname started"
@@ -54,7 +54,7 @@ errs=0
 while true; do
     out=$(mktemp)
     mailfile=$(mktemp)
-    if no_interrupt "$mydir"/cj-unattended-upgrades > "$out" 2>&1; then
+    if no_interrupt "$mydir"/cj-unattended-upgrades-run > "$out" 2>&1; then
         if [ -s "$out" ]; then
             {
                 print_headers
@@ -66,7 +66,7 @@ while true; do
         errs=1
         {
             print_headers
-            echo 'Subject: cj-unattended-upgrades has failed!'
+            echo 'Subject: cj-unattended-upgrades-run has failed!'
             echo
             echo "This is a serious failure and indicates a bug."
             echo
