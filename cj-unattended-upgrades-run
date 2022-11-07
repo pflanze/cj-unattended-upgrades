@@ -5,7 +5,7 @@ IFS=
 
 #mypath=$(readlink -f "$0")
 # No, only cj-unattended-upgrades is meant to be symlinked
-myname=$(basename "$0")
+myname=cj-unattended-upgrades
 mydir=$(dirname "$0")
 source "$mydir/shared.sh"
 
