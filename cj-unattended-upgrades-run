@@ -43,6 +43,8 @@ die () {
 
 date > "$spoolfile"
 
+cj-aptclean
+
 updatetmp=$(mktemp)
 
 # apt-get -q=2 update > "$updtmp" 2>&1
