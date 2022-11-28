@@ -78,6 +78,7 @@ if numdone=$(perl -wne '
         echo
         perhaps_showfile "update output" "$updatetmp"
         perhaps_showfile "upgrade output" "$upgradetmp"
+        need-reboot --set 1
     fi
 
 else
