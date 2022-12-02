@@ -18,7 +18,6 @@ Future:
 
 - Keep time stamp of last upgrade, so that it doesn't run upgrades on frequent reboots
 - Check for and report on the need to reboot
-- Run apt-get clean?
 - More efficient polling, or some kind of push notification?
 - Report when support for the installed release is (soon to be) dropped?
 - Report when there was no upgrade in some time (either no access to Debian servers, or none published there?)

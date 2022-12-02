@@ -5,7 +5,7 @@ IFS=
 
 #mypath=$(readlink -f "$0")
 # No, only cj-unattended-upgrades is meant to be symlinked
-myname=$(basename "$0")
+myname=cj-unattended-upgrades
 mydir=$(dirname "$0")
 source "$mydir/shared.sh"
 
@@ -43,6 +43,8 @@ die () {
 
 date > "$spoolfile"
 
+cj-aptclean
+
 updatetmp=$(mktemp)
 
 # apt-get -q=2 update > "$updtmp" 2>&1
@@ -76,6 +78,7 @@ if numdone=$(perl -wne '
         echo
         perhaps_showfile "update output" "$updatetmp"
         perhaps_showfile "upgrade output" "$upgradetmp"
+        need-reboot --set 1
     fi
 
 else
