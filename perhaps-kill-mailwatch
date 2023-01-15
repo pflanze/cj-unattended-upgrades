@@ -1,0 +1,117 @@
+#!/usr/bin/env perl
+
+my $copyright= <<'COPYRIGHT';
+# Copyright 2023 by Christian Jaeger <ch@christianjaeger.ch>
+# Published under the same terms as perl itself
+COPYRIGHT
+
+use strict;
+use utf8;
+use warnings;
+use warnings FATAL => 'uninitialized';
+use experimental 'signatures';
+
+my ($email_full)= $copyright=~ / by ([^\n]*)/s;
+
+my ($mydir, $myname);
+BEGIN {
+    $0=~ /(.*?)([^\/]+)\z/s or die "?";
+    ($mydir, $myname)=($1,$2);
+}
+
+use Getopt::Long;
+#use Chj::ruse;
+#use Chj::Backtrace; 
+# use FP::Show; use FP::Repl; use FP::Repl::Trap; #
+
+my $max_age_hours = 18;
+my $maxx_age_hours = 48;
+
+sub usage {
+    print STDERR map{"$_\n"} @_ if @_;
+    print "$myname
+
+  Kill mailwatch xfce4 plugin if running for longer than
+  $maxx_age_hours hours or it's night time and it has been running for
+  longer than $max_age_hours hours.
+
+  ($email_full)
+";
+exit (@_ ? 1 : 0);
+}
+
+our $verbose=0;
+our $opt_dry;
+GetOptions("verbose"=> \$verbose,
+	   "help"=> sub{usage},
+	   "dry-run"=> \$opt_dry,
+	   ) or exit 1;
+usage if @ARGV;
+
+
+use Chj::xperlfunc qw(xlocaltime);
+use Chj::IO::Command;
+use FP::PureArray ":all";
+
+sub is_night_time($t) {
+    my $l = xlocaltime $t;
+    my $h = $l->hour;
+    $h < 6 and $h > 1
+}
+
+sub mailwatch_pids() {
+    my $c = Chj::IO::Command->new_sender("ps", "auxww");
+    my @pid;
+    while (<$c>) {
+        if (m|xfce4/panel/wrapper.*libmailwatch|) {
+            my ($pid)= m|^\S+\s+(\d+)| or die "can't parse line: '$_'";
+            push @pid, $pid
+        }
+    }
+    $c->xxfinish;
+    array_to_purearray \@pid
+}       
+        
+sub pid_start_time($pid) {
+    my $c = Chj::IO::Command->new_sender("ps-start-time", "-u", $pid);
+    my $cnt = $c->xcontent;
+    $c->xxfinish;
+    chomp $cnt;
+    my @p = split /\s+/, $cnt;
+    @p == 2 or die "expected 2 numbers, got '$cnt'";
+    $p[1]
+}
+
+my $mailwatches = mailwatch_pids->map(
+    sub ($pid) {
+        [ $pid, pid_start_time($pid) ]
+    });
+
+my $now = time;
+my $is_night_time = is_night_time $now;
+my $allowed_age_sec = ($is_night_time ? $max_age_hours : $maxx_age_hours) * 3600;
+    
+my $old_mailwatch_pids = $mailwatches->filter(
+    sub ($pid_t) {
+        my ($pid, $t)= @$pid_t;
+        my $alive_sec = $now - $t;
+        $alive_sec > $allowed_age_sec
+    })
+    ->map(
+    sub ($pid_t) {
+        my ($pid, $t)= @$pid_t;
+        $pid
+    });
+
+unless ($opt_dry) {
+    $old_mailwatch_pids->for_each(
+        sub ($pid) {
+            if (kill "INT", $pid) {
+                print "killed mailwatch pid $pid\n";
+            } else {
+                warn "kill 'INT', $pid: $!";
+            }
+        });
+}
+
+# repl
