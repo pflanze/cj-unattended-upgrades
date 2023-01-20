@@ -26,14 +26,16 @@ use Getopt::Long;
 
 my $max_age_hours = 18;
 my $maxx_age_hours = 48;
+my $night_begin = 1; # 01:00
+my $night_end = 7; # 07:00
 
 sub usage {
     print STDERR map{"$_\n"} @_ if @_;
     print "$myname
 
   Kill mailwatch xfce4 plugin if running for longer than
-  $maxx_age_hours hours or it's night time and it has been running for
-  longer than $max_age_hours hours.
+  $maxx_age_hours hours or it is night time ($night_begin <= hour < $night_end) and
+  mailwatch has been running for longer than $max_age_hours hours.
 
   ($email_full)
 ";
@@ -56,7 +58,7 @@ use FP::PureArray ":all";
 sub is_night_time($t) {
     my $l = xlocaltime $t;
     my $h = $l->hour;
-    $h < 6 and $h > 1
+    $night_begin <= $h and $h < $night_end
 }
 
 sub mailwatch_pids() {
