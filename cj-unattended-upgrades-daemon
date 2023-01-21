@@ -54,6 +54,12 @@ trap 'echo "$myname stopped"' 15
 
 errs=0
 while true; do
+    # Regularly restart mailwatch since it is leaking tons of memory
+    # (xfce4-mailwatch-plugin 1.3.0-1). Do this check before possibly
+    # generating a mail in the next task, since we can't restart
+    # mailwatch if there's a mail in the box.
+    "$mydir"/perhaps-kill-mailwatch || true
+
     out=$(mktemp)
     mailfile=$(mktemp)
     if no_interrupt "$mydir"/cj-unattended-upgrades-run > "$out" 2>&1; then
@@ -87,10 +93,6 @@ while true; do
         exit 1
     fi
 
-    # Regularly restart mailwatch since it is leaking tons of memory
-    # (xfce4-mailwatch-plugin 1.3.0-1)
-    "$mydir"/perhaps-kill-mailwatch || true
-    
     # Do not add --quiet flag right now, to allow for debugging
     sleep-random "${CJ_UNATTENDED_UPGRADES_SLEEPTIME-4h}"
     echo wake-up
