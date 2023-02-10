@@ -36,8 +36,7 @@ Future:
 
 * Install [chj-scripts](https://github.com/pflanze/chj-scripts.git)
   (maybe via [chjize](https://github.com/pflanze/chjize)), as well
-  `daemontools` (used for the logging) and `libtime-parsedate-perl`
-  (not installed by chjize, currently).
+  `daemontools` (used for the logging) and `libtime-parsedate-perl`.
 
 * Run `cj-unattended-upgrades` without arguments to verify that
   the config and dependencies are available.  The chj-scripts must be
