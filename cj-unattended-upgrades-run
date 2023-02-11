@@ -18,6 +18,7 @@ fi
 
 updatetmp=
 upgradetmp=
+lsoftmp=
 
 perhaps_showfile () {
     local filekind
@@ -37,6 +38,7 @@ die () {
     echo
     perhaps_showfile "update output" "$updatetmp"
     perhaps_showfile "upgrade output" "$upgradetmp"
+    perhaps_showfile "processes holding old file versions open" "$lsoftmp"
     rm -f "$spoolfile"
     exit 0 # OK?
 }
@@ -79,6 +81,9 @@ if numdone=$(perl -wne '
         perhaps_showfile "update output" "$updatetmp"
         perhaps_showfile "upgrade output" "$upgradetmp"
         need-reboot --set 1
+        lsoftmp=$(mktemp)
+        lsof-deleted > "$lsoftmp" 2>/dev/null
+        perhaps_showfile "processes holding old file versions open" "$lsoftmp"
     fi
 
 else
