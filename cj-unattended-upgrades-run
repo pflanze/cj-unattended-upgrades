@@ -76,7 +76,12 @@ if numdone=$(perl -wne '
 ' < "$upgradetmp"); then
 
     if [ "$numdone" -gt 0 ]; then
-        echo "Subject: $myname: $numdone packages upgraded/installed"
+        if [ "$numdone" -eq 1 ]; then
+            packageS=package
+        else
+            packageS=packages
+        fi
+        echo "Subject: $myname: $numdone $packageS upgraded/installed"
         echo
         perhaps_showfile "update output" "$updatetmp"
         perhaps_showfile "upgrade output" "$upgradetmp"
