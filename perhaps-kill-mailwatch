@@ -130,13 +130,13 @@ unless ($opt_dry) {
             # arrived there (huh?).
             my $user = pid_user($pid);
             if (user_has_mail($user)) {
-                print "not killing mailwatch pid $pid (user $user) ".
+                print "not killing mailwatch pid $pid (user: $user) ".
                     "as user has mail\n";
             } else {
                 if (kill "INT", $pid) {
-                    print "killed mailwatch pid $pid (user $user)\n";
+                    print "killed mailwatch pid $pid (user: $user)\n";
                 } else {
-                    warn "kill 'INT', $pid (user $user): $!";
+                    warn "kill 'INT', $pid (user: $user): $!";
                 }
             }
         });
